@@ -1,0 +1,28 @@
+{
+  "presupuesto_total": 5840,
+  "items": [
+    {"programa": "PCI/PMI", "tipo": "convocado", "año": 2021, "importe": 785, "fuente": "Página Comisión PCI/PMI", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "convocado", "año": 2022, "importe": 800, "fuente": "Página Comisión PCI/PMI", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "convocado", "año": 2023, "importe": 750, "fuente": "Página Comisión PCI/PMI", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "convocado", "año": 2024, "importe": 850, "fuente": "CINEA 22/11/2024", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "convocado", "año": 2025, "importe": 600, "fuente": "CINEA 02/04/2025", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "convocado", "año": 2026, "importe": 600, "fuente": "CINEA 30/04/2026", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "adjudicado", "año": 2021, "importe": 1037, "fuente": "CINEA 26/01/2022", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "adjudicado", "año": 2022, "importe": 602, "fuente": "CINEA 08/12/2022", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "adjudicado", "año": 2023, "importe": 593.87, "fuente": "CINEA 08/12/2023", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "adjudicado", "año": 2024, "importe": 1250, "fuente": "CINEA 29/01/2025 (redondeado)", "verificado": true},
+    {"programa": "PCI/PMI", "tipo": "adjudicado", "año": 2025, "importe": 650, "fuente": "CINEA 28/01/2026 (aproximado)", "verificado": true},
+    {"programa": "CB-RES", "tipo": "convocado", "año": 2021, "importe": 1, "fuente": "CINEA 22/09/2021", "verificado": true},
+    {"programa": "CB-RES", "tipo": "convocado", "año": 2022, "importe": 1, "fuente": "CINEA 20/09/2022", "verificado": true},
+    {"programa": "CB-RES", "tipo": "convocado", "año": 2023, "importe": 50, "fuente": "CINEA 19/12/2023", "verificado": true},
+    {"programa": "CB-RES", "tipo": "convocado", "año": 2024, "importe": 80, "fuente": "CINEA 22/10/2024", "verificado": true},
+    {"programa": "CB-RES", "tipo": "convocado", "año": 2025, "importe": 150, "fuente": "CINEA 04/11/2025", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2021, "importe": 0.30, "fuente": "CINEA 30/08/2022 (aprox.)", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2022, "importe": 0.2525, "fuente": "CINEA 08/05/2023", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2022, "importe": 22.10, "fuente": "CINEA 10/07/2023", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2023, "importe": 1.02, "fuente": "CINEA 04/07/2024", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2023, "importe": 67.40, "fuente": "CINEA 19/07/2024", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2024, "importe": 76.30, "fuente": "CINEA 23/09/2025", "verificado": true},
+    {"programa": "CB-RES", "tipo": "adjudicado", "año": 2025, "importe": 125.81, "fuente": "CINEA 17/09/2026", "verificado": true}
+  ]
+}
