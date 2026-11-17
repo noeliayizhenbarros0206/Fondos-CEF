@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fondos UE gestionados por CINEA</title>
+<style>
+  :root { --a:#1f5fa8; --b:#e08a1e; --line:#e3e6ea; --muted:#667; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 0; color: #1d2329; background: #fafbfc; }
+  header { background: #fff; border-bottom: 1px solid var(--line); padding: 1rem 1.5rem; }
+  header h1 { margin: 0; font-size: 1.35rem; }
+  header small { color: var(--muted); }
+  main { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+  .filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .8rem;
+             background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 1rem; }
+  .filtros label { font-size: .8rem; color: var(--muted); display: block; margin-bottom: .25rem; font-weight: 600; }
+  select, input[type=number] { width: 100%; padding: .4rem; border: 1px solid #ccd; border-radius: 6px; font: inherit; background: #fff; }
+  .checks label { display: inline-flex; gap: .3rem; align-items: center; font-size: .9rem; color: #1d2329;
+                  font-weight: 400; margin: 0 .7rem .2rem 0; }
+  .acciones { display: flex; gap: .5rem; align-items: end; }
+  button { padding: .45rem .8rem; border: 1px solid #ccd; border-radius: 6px; background: #fff; cursor: pointer; font: inherit; }
+  button:hover { background: #f0f3f7; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .8rem; margin: 1rem 0; }
+  .k { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: .8rem; }
+  .k span { font-size: .8rem; color: var(--muted); }
+  .k b { display: block; font-size: 1.45rem; margin-top: .2rem; font-variant-numeric: tabular-nums; }
+  .k small { color: var(--muted); font-size: .75rem; }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+  section h2 { margin: 0 0 .6rem; font-size: 1.05rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  th, td { padding: .4rem .5rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { background: #f4f6f8; font-weight: 600; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.total td { font-weight: 700; }
+  .leyenda { display: flex; gap: 1rem; font-size: .8rem; color: var(--muted); margin-bottom: .4rem; }
+  .leyenda i { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; margin-right: .3rem; vertical-align: -1px; }
+  .aviso { background: #fff4e5; border-left: 4px solid var(--b); padding: .6rem .8rem; border-radius: 4px; margin: 1rem 0; }
+  .nota { color: var(--muted); font-size: .8rem; }
+  a { color: var(--a); }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fondos UE gestionados por CINEA</h1>
+  <small id="meta">Cargando datos…</small>
+</header>
+<main>
+  <div class="filtros">
+    <div><label for="f-prog">Programa</label><select id="f-prog"></select></div>
+    <div><label>Línea</label><div id="f-lineas" class="checks"></div></div>
+    <div><label for="f-tipo">Tipo</label>
+      <select id="f-tipo">
+        <option value="ambos">Convocado y adjudicado</option>
+        <option value="convocado">Solo convocado</option>
+        <option value="adjudicado">Solo adjudicado</option>
+      </select></div>
+    <div><label>Años</label>
+      <div style="display:flex;gap:.4rem"><input id="f-desde" type="number"><input id="f-hasta" type="number"></div></div>
+    <div><label for="f-agrupar">Agrupar por</label>
+      <select id="f-agrupar">
+        <option value="anio">Año</option>
+        <option value="linea">Línea</option>
+        <option value="programa">Programa</option>
+      </select></div>
+    <div class="acciones"><button id="b-reset">Quitar filtros</button><button id="b-csv">Descargar CSV</button></div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+  <div id="aviso"></div>
+
+  <section>
+    <h2 id="t-grupo">Resumen</h2>
+    <div class="leyenda"><span><i style="background:var(--a)"></i>Convocado</span><span><i style="background:var(--b)"></i>Adjudicado</span></div>
+    <div id="grafico"></div>
+    <div class="scroll"><table id="tabla-grupo"></table></div>
+  </section>
+
+  <section>
+    <h2>Novedades detectadas en CINEA</h2>
+    <p class="nota">Se detectan automáticamente cada día. No cambian las cifras hasta validarlas en los archivos de datos.</p>
+    <div class="scroll"><table id="tabla-nov"></table></div>
+  </section>
+
+  <section>
+    <h2>Detalle</h2>
+    <div class="scroll"><table id="tabla-detalle"></table></div>
+  </section>
+
+  <p class="nota">Criterio: solo importes del texto de noticias oficiales de CINEA o de la Comisión Europea. Si el texto es aproximado,
+  se usa la suma de los proyectos. Pendiente de convocar = presupuesto − convocado; pendiente de conceder = presupuesto − adjudicado.
+  Los pendientes solo se muestran para un programa completo (todas sus líneas y todos los años), porque el presupuesto no se reparte por línea ni por año.</p>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const nf = (x, d = 2) => x == null ? '—' : x.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: d, useGrouping: 'always' });
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let D, anios = [];
+
+fetch('data.json?' + Date.now()).then(r => r.json()).then(d => { D = d; iniciar(); })
+  .catch(() => { $('meta').textContent = 'No se ha podido cargar data.json. Ejecuta el flujo de GitHub Actions.'; });
+
+function iniciar() {
+  anios = [...new Set(D.items.map(i => i.anio))].sort();
+  $('meta').textContent = `Revisión de noticias: ${D.generado}. Importes en millones de euros (M€).`;
+  $('f-prog').innerHTML = '<option value="todos">Todos los programas</option>' +
+    D.programas.map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join('');
+  leerURL();
+  ['f-prog', 'f-tipo', 'f-desde', 'f-hasta', 'f-agrupar'].forEach(id => $(id).addEventListener('change', () => {
+    if (id === 'f-prog') pintarLineas();
+    actualizar();
+  }));
+  $('b-reset').onclick = () => { history.replaceState(null, '', location.pathname); leerURL(); };
+  $('b-csv').onclick = csv;
+}
+
+function leerURL() {
+  const q = new URLSearchParams(location.search);
+  $('f-prog').value = q.get('programa') || 'todos';
+  $('f-tipo').value = q.get('tipo') || 'ambos';
+  $('f-desde').value = q.get('desde') || anios[0] || '';
+  $('f-hasta').value = q.get('hasta') || anios[anios.length - 1] || '';
+  $('f-agrupar').value = q.get('agrupar') || 'anio';
+  pintarLineas(q.get('lineas'));
+  actualizar();
+}
+
+function lineasDisponibles() {
+  const p = $('f-prog').value;
+  const progs = p === 'todos' ? D.programas : D.programas.filter(x => x.id === p);
+  return [...new Set(progs.flatMap(x => x.lineas))];
+}
+
+function pintarLineas(sel) {
+  const marcadas = sel ? sel.split('|') : null;
+  $('f-lineas').innerHTML = lineasDisponibles().map(l =>
+    `<label><input type="checkbox" value="${esc(l)}" ${!marcadas || marcadas.includes(l) ? 'checked' : ''}>${esc(l)}</label>`).join('');
+  $('f-lineas').querySelectorAll('input').forEach(c => c.addEventListener('change', actualizar));
+}
+
+function filtros() {
+  return {
+    prog: $('f-prog').value,
+    lineas: [...$('f-lineas').querySelectorAll('input:checked')].map(c => c.value),
+    tipo: $('f-tipo').value,
+    desde: +$('f-desde').value || -Infinity,
+    hasta: +$('f-hasta').value || Infinity,
+    agrupar: $('f-agrupar').value,
+  };
+}
+
+function filtrar(f) {
+  return D.items.filter(i =>
+    (f.prog === 'todos' || i.programa === f.prog) &&
+    f.lineas.includes(i.linea) &&
+    (f.tipo === 'ambos' || i.tipo === f.tipo) &&
+    i.anio >= f.desde && i.anio <= f.hasta);
+}
+
+const suma = (arr, tipo) => arr.filter(i => i.tipo === tipo).reduce((s, i) => s + i.importe, 0);
+const nombreProg = id => (D.programas.find(p => p.id === id) || {}).nombre || id;
+
+function actualizar() {
+  const f = filtros(), it = filtrar(f);
+  guardarURL(f);
+  const conv = suma(it, 'convocado'), adj = suma(it, 'adjudicado');
+
+  // Pendientes: solo con un programa completo
+  const prog = D.programas.find(p => p.id === f.prog);
+  const completo = prog && prog.presupuesto_total != null && f.tipo === 'ambos' &&
+    prog.lineas.every(l => f.lineas.includes(l)) &&
+    f.desde <= anios[0] && f.hasta >= anios[anios.length - 1];
+  const motivo = !prog ? 'Elige un programa' : prog.presupuesto_total == null ? 'Presupuesto sin verificar'
+    : 'Quita los filtros de línea, tipo o año';
+
+  $('kpis').innerHTML = [
+    ['Presupuesto', prog ? prog.presupuesto_total : null, prog ? (prog.fuente_presupuesto || '') : 'Elige un programa'],
+    ['Convocado', f.tipo === 'adjudicado' ? null : conv, 'Según filtros'],
+    ['Adjudicado', f.tipo === 'convocado' ? null : adj, 'Según filtros'],
+    ['Pendiente de convocar', completo ? prog.presupuesto_total - conv : null, completo ? 'Presupuesto − convocado' : motivo],
+    ['Pendiente de conceder', completo ? prog.presupuesto_total - adj : null, completo ? 'Presupuesto − adjudicado' : motivo],
+  ].map(([t, v, s]) => `<div class="k"><span>${t}</span><b>${nf(v)}</b><small>${esc(s)}</small></div>`).join('');
+
+  // Aviso de adjudicaciones sin validar
+  const nov = D.novedades.filter(n => (f.prog === 'todos' || n.programa === f.prog));
+  const pend = nov.filter(n => n.tipo === 'adjudicación' && n.importe && n.estado === 'pendiente de validar');
+  $('aviso').innerHTML = pend.length ? `<div class="aviso">Hay ${pend.length} adjudicación(es) nueva(s) sin validar por
+    ${nf(pend.reduce((s, n) => s + n.importe, 0))} M€.${completo ? ` Si se confirman, el pendiente de conceder pasaría a
+    <b>${nf(prog.presupuesto_total - adj - pend.reduce((s, n) => s + n.importe, 0))} M€</b>.` : ''}</div>` : '';
+
+  // Agrupación
+  const clave = i => f.agrupar === 'programa' ? nombreProg(i.programa) : i[f.agrupar];
+  const grupos = {};
+  it.forEach(i => { const k = clave(i); (grupos[k] ||= { c: 0, a: 0 }); i.tipo === 'convocado' ? grupos[k].c += i.importe : grupos[k].a += i.importe; });
+  const filas = Object.entries(grupos).sort((x, y) => String(x[0]).localeCompare(String(y[0]), 'es', { numeric: true }));
+  const titulo = { anio: 'Año', linea: 'Línea', programa: 'Programa' }[f.agrupar];
+  $('t-grupo').textContent = 'Resumen por ' + titulo.toLowerCase();
+  $('tabla-grupo').innerHTML = `<tr><th>${titulo}</th><th class="n">Convocado</th><th class="n">Adjudicado</th><th class="n">Diferencia</th></tr>` +
+    filas.map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${nf(v.c)}</td><td class="n">${nf(v.a)}</td><td class="n">${nf(v.c - v.a)}</td></tr>`).join('') +
+    `<tr class="total"><td>Total</td><td class="n">${nf(conv)}</td><td class="n">${nf(adj)}</td><td class="n">${nf(conv - adj)}</td></tr>`;
+  grafico(filas);
+
+  // Detalle
+  $('tabla-detalle').innerHTML = '<tr><th>Programa</th><th>Línea</th><th>Tipo</th><th>Año</th><th class="n">M€</th><th>Fuente</th><th>Nota</th></tr>' +
+    (it.sort((a, b) => a.anio - b.anio || a.linea.localeCompare(b.linea)).map(i =>
+      `<tr><td>${esc(nombreProg(i.programa))}</td><td>${esc(i.linea)}</td><td>${esc(i.tipo)}</td><td>${i.anio}</td>
+       <td class="n">${nf(i.importe, 4)}</td><td>${i.url ? `<a href="${esc(i.url)}">${esc(i.fuente)}</a>` : esc(i.fuente)}</td><td>${esc(i.nota)}</td></tr>`).join('')
+      || '<tr><td colspan="7">No hay datos verificados para esta selección.</td></tr>');
+
+  // Novedades
+  $('tabla-nov').innerHTML = '<tr><th>Detectada</th><th>Programa</th><th>Línea</th><th>Tipo</th><th class="n">M€</th><th>Noticia</th><th>Estado</th></tr>' +
+    (nov.map(n => `<tr><td>${n.fecha}</td><td>${esc(nombreProg(n.programa))}</td><td>${esc(n.linea)}</td><td>${esc(n.tipo)}</td>
+      <td class="n">${n.importe ? nf(n.importe, 4) + (n.aprox ? ' (aprox.)' : '') : '—'}</td>
+      <td><a href="${esc(n.url)}">${esc(n.titulo)}</a></td><td>${esc(n.estado)}</td></tr>`).join('')
+      || '<tr><td colspan="7">Sin novedades desde la última revisión.</td></tr>');
+}
+
+function grafico(filas) {
+  if (!filas.length) { $('grafico').innerHTML = ''; return; }
+  const max = Math.max(...filas.flatMap(([, v]) => [v.c, v.a]), 1);
+  const W = 900, H = 220, pad = 30, bw = Math.min(28, (W - pad * 2) / filas.length / 2.6);
+  const paso = (W - pad * 2) / filas.length;
+  let s = `<svg viewBox="0 0 ${W} ${H + 30}" width="100%" role="img" aria-label="Gráfico convocado frente a adjudicado">`;
+  filas.forEach(([k, v], i) => {
+    const x = pad + i * paso + paso / 2;
+    [[v.c, 'var(--a)', -bw - 2], [v.a, 'var(--b)', 2]].forEach(([val, col, dx]) => {
+      const h = val / max * (H - 20);
+      s += `<rect x="${x + dx}" y="${H - h}" width="${bw}" height="${h}" fill="${col}" rx="2"><title>${esc(k)}: ${nf(val)} M€</title></rect>`;
+    });
+    s += `<text x="${x}" y="${H + 16}" font-size="12" text-anchor="middle" fill="#555">${esc(String(k).slice(0, 16))}</text>`;
+  });
+  $('grafico').innerHTML = s + `<line x1="${pad}" x2="${W - pad}" y1="${H}" y2="${H}" stroke="#ccc"/></svg>`;
+}
+
+function guardarURL(f) {
+  const q = new URLSearchParams({ programa: f.prog, tipo: f.tipo, desde: $('f-desde').value, hasta: $('f-hasta').value, agrupar: f.agrupar });
+  if (f.lineas.length !== lineasDisponibles().length) q.set('lineas', f.lineas.join('|'));
+  history.replaceState(null, '', '?' + q);
+}
+
+function csv() {
+  const it = filtrar(filtros());
+  const filas = [['programa', 'linea', 'tipo', 'anio', 'importe_meur', 'fuente', 'nota'],
+    ...it.map(i => [nombreProg(i.programa), i.linea, i.tipo, i.anio, String(i.importe).replace('.', ','), i.fuente, i.nota || ''])];
+  const txt = '﻿' + filas.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv' }));
+  a.download = 'fondos_cinea.csv'; a.click();
+}
+</script>
+</body>
+</html>

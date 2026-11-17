@@ -1,0 +1,27 @@
+{
+  "programas": [
+    {
+      "id": "cef-energy",
+      "nombre": "CEF Energy",
+      "datos": "data/cef-energy.json",
+      "palabras_clave": ["cef energy", "connecting europe facility for energy", "cb res", "cb-res", "pci", "pmi",
+                         "projects of common interest", "cross-border renewable", "energy infrastructure"],
+      "lineas": [
+        {"nombre": "CB-RES", "palabras_clave": ["cb res", "cb-res", "cross-border renewable", "cross border renewable"]},
+        {"nombre": "PCI/PMI", "palabras_clave": ["pci", "pmi", "projects of common interest", "projects of mutual interest", "energy infrastructure"]}
+      ]
+    },
+    {
+      "id": "cef-transport",
+      "nombre": "CEF Transport",
+      "datos": "data/cef-transport.json",
+      "palabras_clave": ["cef transport", "connecting europe facility for transport", "ten-t", "transport infrastructure",
+                         "military mobility", "afif", "alternative fuels infrastructure"],
+      "lineas": [
+        {"nombre": "AFIF", "palabras_clave": ["afif", "alternative fuels infrastructure"]},
+        {"nombre": "Movilidad militar", "palabras_clave": ["military mobility", "dual-use"]},
+        {"nombre": "Transporte general y cohesión", "palabras_clave": ["ten-t", "transport infrastructure", "cef transport"]}
+      ]
+    }
+  ]
+}
